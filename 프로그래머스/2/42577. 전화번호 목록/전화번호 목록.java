@@ -1,5 +1,4 @@
 import java.util.Arrays;
-import java.util.Comparator;
 
 class Solution {
     public boolean solution(String[] phone_book) {
