@@ -1,0 +1,18 @@
+import java.util.Arrays;
+import java.util.Comparator;
+
+class Solution {
+    public boolean solution(String[] phone_book) {
+        Arrays.sort(phone_book);
+        
+        for (int i = 0 ; i < phone_book.length - 1; i++) {
+            String currentNumber = phone_book[i];
+            
+            if (phone_book[i + 1].startsWith(currentNumber)) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+}
