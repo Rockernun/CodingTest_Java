@@ -55,13 +55,13 @@ class Solution {
         
         for (Student student : students) {
             if (student.answerCount > max) {
-                max = student.answerCount;
+                max = student.getAnswerCount();
             }
         }
         
         for (Student student : students) {
-            if (max == student.answerCount) {
-                result.add(student.number);
+            if (max == student.getAnswerCount()) {
+                result.add(student.getStudentNumber());
             }
         }
         
