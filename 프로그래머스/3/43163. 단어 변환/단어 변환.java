@@ -32,10 +32,10 @@ class Solution {
             }
         }
         
-        return bfs(0, target, newWords);
+        return bfs(0, target);
     }
     
-    private int bfs(int startIndex, String target, String[] newWords) {
+    private int bfs(int startIndex, String target) {
         Deque<Integer> queue = new ArrayDeque<>();
         int[] count = new int[newWords.length];
         queue.offer(startIndex);
