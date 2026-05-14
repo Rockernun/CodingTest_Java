@@ -1,72 +1,72 @@
-import java.util.Deque;
-import java.util.LinkedList;
+import java.util.*;
 
 class Solution {
-
-    private static final int[] dx = {-1, 1, 0, 0};
-    private static final int[] dy = {0, 0, -1, 1};
+    
+    static int[] dx = {0, 0, -1, 1};
+    static int[] dy = {1, -1, 0, 0};
     static boolean[][] visited;
-    static char[][] charInfo;
-
+    static int n;
+    static int m;
+    
     public int solution(String[] maps) {
-        charInfo = new char[maps.length][maps[0].length()];
-        visited = new boolean[maps.length][maps[0].length()];
-        int[] startPosition = new int[2];
-        int[] leverPosition = new int[2];
-        int[] exitGatePosition = new int[2];
+        n = maps.length;
+        m = maps[0].length();
+        int[] start = new int[2];
+        int[] lever = new int[2];
+        int[] exit = new int[2];
 
-        for (int i = 0; i < maps.length; i++) {
-            for (int j = 0; j < maps[i].length(); j++) {
-
-                charInfo[i][j] = maps[i].charAt(j);
-
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
                 if (maps[i].charAt(j) == 'S') {
-                    startPosition = new int[]{i, j};
-                }
-
-                if (maps[i].charAt(j) == 'L') {
-                    leverPosition = new int[]{i, j};
-                }
-
-                if (maps[i].charAt(j) == 'E') {
-                    exitGatePosition = new int[]{i, j};
+                    start[0] = i;
+                    start[1] = j;
+                } else if (maps[i].charAt(j) == 'L') {
+                    lever[0] = i;
+                    lever[1] = j;
+                } else if (maps[i].charAt(j) == 'E') {
+                    exit[0] = i;
+                    exit[1] = j;
                 }
             }
         }
+        int toLever = bfs(start[0], start[1], lever, 0, maps);
+        int toExit = bfs(lever[0], lever[1], exit, 0, maps);
         
-        int routeToFindLever = bfs(startPosition, leverPosition);
-        visited = new boolean[maps.length][maps[0].length()];
-        int routeToWayOut = bfs(leverPosition, exitGatePosition);
-        
-        if (routeToFindLever == 0 || routeToWayOut == 0){
-           return -1;
+        if (toLever != -1 && toExit != -1) {
+            return toLever + toExit;
+        } else {
+            return -1;
         }
-        
-        return routeToFindLever + routeToWayOut;
     }
-
-    private int bfs(int[] startPosition, int[] targetPosition) {
-        Deque<int[]> queue = new LinkedList<>();
-        queue.offer(new int[]{startPosition[0], startPosition[1], 0});
-
+    
+    private int bfs(int startX, int startY, int[] target, int second, String[] maps) {
+        Deque<int[]> queue = new ArrayDeque<>();
+        queue.offer(new int[]{startX, startY, second});
+        visited = new boolean[n][m];
+        visited[startX][startY] = true;
+        
         while (!queue.isEmpty()) {
             int[] currentPosition = queue.poll();
-            visited[currentPosition[0]][currentPosition[1]] = true;
+            
+            if (currentPosition[0] == target[0] && currentPosition[1] == target[1]) {
+                return currentPosition[2];
+            }
+            
             for (int i = 0; i < 4; i++) {
                 int nX = currentPosition[0] + dx[i];
                 int nY = currentPosition[1] + dy[i];
-
-                if (nX >= 0 && nX < visited.length && nY >= 0 && nY < visited[0].length && charInfo[nX][nY] != 'X' && !visited[nX][nY]) {
-                    visited[nX][nY] = true;
-                    queue.offer(new int[]{nX, nY, currentPosition[2] + 1});
-                }
-
-                if (currentPosition[0] == targetPosition[0] && currentPosition[1] == targetPosition[1]) {
-                    return currentPosition[2];
+                
+                if (nX >= 0 && nX < n && nY >= 0 && nY < m) {
+                    int nextMove = maps[nX].charAt(nY);
+                    if (!visited[nX][nY]) {
+                        if (nextMove != 'X') {
+                            queue.offer(new int[]{nX, nY, currentPosition[2] + 1});
+                            visited[nX][nY] = true;
+                        }
+                    }
                 }
             }
         }
-
-        return 0;
+        return -1;
     }
 }
