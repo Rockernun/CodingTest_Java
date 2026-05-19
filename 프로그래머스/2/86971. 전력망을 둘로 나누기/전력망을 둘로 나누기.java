@@ -1,50 +1,73 @@
-import java.util.List;
-import java.util.ArrayList;
+import java.util.*;
 
 class Solution {
     
-    static List<Integer>[] wiresInfo;
-    static int answer;
+    static Map<Integer, List<Integer>> edgeInfo;
+    static boolean[] visited;
+    static Integer answer = Integer.MAX_VALUE;
     
     public int solution(int n, int[][] wires) {
-        wiresInfo = new ArrayList[n + 1];
-        answer = Integer.MAX_VALUE;
+        edgeInfo = new HashMap<>();
         
         for (int i = 1; i <= n; i++) {
-            wiresInfo[i] = new ArrayList<>();
+            edgeInfo.put(i, new ArrayList<>());
         }
         
-        for (int i = 0; i < wires.length; i++) {
-            wiresInfo[wires[i][0]].add(wires[i][1]);
-            wiresInfo[wires[i][1]].add(wires[i][0]);
-        }
-
         for (int[] wire : wires) {
-            int wireCut1 = wire[0];
-            int wireCut2 = wire[1];
-            boolean[] visited = new boolean[n + 1];
+            edgeInfo.get(wire[0]).add(wire[1]);
+            edgeInfo.get(wire[1]).add(wire[0]);
+        }
+        
+        for (int[] wire : wires) {
+            visited = new boolean[n + 1];
+            List<Integer> output = new ArrayList<>();
+            deleteConnection(wire);
             
-            int count = dfs(1, visited, wireCut1, wireCut2);
-            answer = Math.min(answer, Math.abs(count - (n - count)));
+            for (int i = 1; i < visited.length; i++) {
+                if (!visited[i]) {
+                    int result = bfs(i);
+                    output.add(result);
+                }
+            }
+            
+            if (Math.abs(output.get(0) - output.get(1)) < answer) {
+                answer = Math.abs(output.get(0) - output.get(1));
+            }
+
+            recoverConnection(wire);
         }
         
         return answer;
     }
     
-    private int dfs(int start, boolean[] visited, int wireCut1, int wireCut2) {
+    private int bfs(int start) {
+        Deque<Integer> queue = new ArrayDeque<>();
+        int count = 0;
+        queue.offer(start);
         visited[start] = true;
-        int count = 1;
         
-        for (int nextWire : wiresInfo[start]) {
-            if (start == wireCut1 && nextWire == wireCut2 || nextWire == wireCut1 && start == wireCut2) {
-                continue;
-            }
+        while (!queue.isEmpty()) {
+            int current = queue.poll();
+            count++;
             
-            if (!visited[nextWire]) {
-                count += dfs(nextWire, visited, wireCut1, wireCut2);
+            for (int next : edgeInfo.get(current)) {
+                if (!visited[next]) {
+                    queue.offer(next);
+                    visited[next] = true;
+                }
             }
         }
         
         return count;
+    }
+    
+    private void deleteConnection(int[] edge) {
+        edgeInfo.get(edge[0]).remove(Integer.valueOf(edge[1]));
+        edgeInfo.get(edge[1]).remove(Integer.valueOf(edge[0]));
+    }
+    
+    private void recoverConnection(int[] edge) {
+        edgeInfo.get(edge[0]).add(edge[1]);
+        edgeInfo.get(edge[1]).add(edge[0]);
     }
 }
