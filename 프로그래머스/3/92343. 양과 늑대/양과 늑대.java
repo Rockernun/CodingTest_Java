@@ -1,39 +1,52 @@
-import java.util.Arrays;
+import java.util.*;
 
 class Solution {
-    int[] tInfo;
-    int[][] edgesInfo;
-    int maxSheepCount = 0;
-
+    
+    static List<List<Integer>> tree;
+    static int maxSheep = 0;
+    
     public int solution(int[] info, int[][] edges) {
-        tInfo = info;
-        edgesInfo = edges;
-        boolean[] initVisited = new boolean[info.length];
-        dfs(0, initVisited, 0, 0);
-
-        return maxSheepCount;
+        tree = new ArrayList<>();
+        
+        for (int i = 0; i < info.length; i++) {
+            tree.add(new ArrayList<>());
+        }
+        
+        for (int[] edge : edges) {
+            tree.get(edge[0]).add(edge[1]);
+        }
+        
+        List<Integer> candidates = new ArrayList<>();
+        candidates.add(0);
+        
+        dfs(candidates, 0, 0, info);
+        return maxSheep;
     }
-
-    private void dfs(int start, boolean[] visited, int sheepCount, int wolfCount) {
-        boolean[] copiedVisited = Arrays.copyOf(visited, visited.length);
-        copiedVisited[start] = true;
-        if (tInfo[start] == 0) {
-            sheepCount++;
-            maxSheepCount = Math.max(maxSheepCount, sheepCount);
-        } else {
-            wolfCount++;
-        }
-
-        if (sheepCount <= wolfCount) {
-            return;
-        }
-
-        for (int[] parentAndChild : edgesInfo) {
-            int parent = parentAndChild[0];
-            int child = parentAndChild[1];
-            if (copiedVisited[parent] && !copiedVisited[child]) {
-                dfs(child, copiedVisited, sheepCount, wolfCount);
+    
+    private void dfs(List<Integer> candidates, int wolf, int sheep, int[] info) {
+        for (int i = 0; i < candidates.size(); i++) {
+            int current = candidates.get(i);
+            
+            int wolfSum = wolf;
+            int sheepSum = sheep;
+            
+            if (info[current] == 0) {
+                sheepSum++;
+            } else {
+                wolfSum++;
             }
+            
+            if (wolfSum >= sheepSum) {
+                continue;
+            }
+            
+            maxSheep = Math.max(maxSheep, sheepSum);
+            
+            List<Integer> newCandidates = new ArrayList<>(candidates);
+            newCandidates.remove(i);
+            newCandidates.addAll(tree.get(current));
+            
+            dfs(newCandidates, wolfSum, sheepSum, info);
         }
     }
 }
