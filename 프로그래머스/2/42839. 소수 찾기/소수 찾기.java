@@ -2,29 +2,30 @@ import java.util.*;
 
 class Solution {
     
-    static Set<Integer> outputSet;
-    static boolean[] visited;
-    static StringBuilder sb;
+    Set<Integer> output;
+    List<Character> charList;
+    boolean[] visited;
+    StringBuilder sb;
     
     public int solution(String numbers) {
-        outputSet = new HashSet<>();
-        List<Character> numberList = new ArrayList<>();
         
-        // 한 자리 숫자들을 삽입한 numberList
+        charList = new ArrayList<>();
+        output = new HashSet<>();
+        
         for (int i = 0; i < numbers.length(); i++) {
-            numberList.add(numbers.charAt(i));
+            charList.add(numbers.charAt(i));
         }
         
-        // 소수인지 판별하고 순열을 실행하면서 파싱한 결과를 outputSet에 삽입한다.
-        for (int i = 1; i <= numberList.size(); i++) {
-            visited = new boolean[numberList.size()];
-            permutation(new ArrayList<>(), i, numberList);
+        for (int i = 1; i < charList.size() + 1; i++) {
+            visited = new boolean[charList.size()];
+            permutation(new ArrayList<>(), i, charList);
         }
         
-        return outputSet.size();
+        return output.size();
     }
     
-    private void permutation(List<Character> current, int r, List<Character> numberList) {
+    private void permutation(List<Character> current, int r, List<Character> charList) {
+        
         if (current.size() == r) {
             sb = new StringBuilder();
             
@@ -33,17 +34,17 @@ class Solution {
             }
             
             if (isPrime(Integer.parseInt(sb.toString()))) {
-                outputSet.add(Integer.parseInt(sb.toString()));
+                output.add(Integer.parseInt(sb.toString()));
             }
             
             return;
         }
         
-        for (int i = 0; i < numberList.size(); i++) {
+        for (int i = 0; i < charList.size(); i++) {
             if (!visited[i]) {
-                current.add(numberList.get(i));
+                current.add(charList.get(i));
                 visited[i] = true;
-                permutation(current, r, numberList);
+                permutation(current, r, charList);
                 current.remove(current.size() - 1);
                 visited[i] = false;
             }
