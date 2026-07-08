@@ -1,37 +1,28 @@
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.List;
+import java.util.*;
 
 class Solution {
-    public static List<Integer> solution(int[] progresses, int[] speeds) {
-
+    public int[] solution(int[] progresses, int[] speeds) {
         Deque<Integer> queue = new ArrayDeque<>();
-        List<Integer> result = new ArrayList<>();
-
+        List<Integer> answer = new ArrayList<>();
+        
         for (int i = 0; i < progresses.length; i++) {
-            int task = progresses[i];
-            int count = 0;
-            while (task < 100) {
-                task += speeds[i];
+            int day = (100 - progresses[i]) / speeds[i];
+            if ((100 - progresses[i]) % speeds[i] != 0) {
+                day++;
+            }
+            queue.offer(day);
+        }
+        
+        while (!queue.isEmpty()) {
+            int count = 1;
+            int first = queue.poll();
+            
+            while (!queue.isEmpty() && first >= queue.peekFirst()) {
+                int poll = queue.poll();
                 count++;
             }
-
-            queue.add(count);
+            answer.add(count);
         }
-
-        while (!queue.isEmpty()) {
-            Integer headTask = queue.removeFirst();
-            int finishedTask = 1;
-
-            while (!queue.isEmpty() && queue.peekFirst() <= headTask) {
-                finishedTask++;
-                queue.removeFirst();
-            }
-
-            result.add(finishedTask);
-        }
-
-        return result;
+        return answer.stream().mapToInt(i -> i).toArray();
     }
 }
