@@ -1,56 +1,60 @@
+// 간선에 대한 정보가 담겨 있기 때문에 인접 리스트를 구성하는게 좋아 보인다.
+// 간선은 양방향 -> 양방향으로 저장할 필요가 있음
+// 가장 먼 노드까지의 
 import java.util.*;
 
 class Solution {
     
-    static boolean[] visited;
-    static Map<Integer, List<Integer>> adjList;
+    Map<Integer, List<Integer>> adjList;  // 인접 리스트
+    boolean[] visited;  // 각 노드의 방문 여부
     
     public int solution(int n, int[][] edge) {
-        visited = new boolean[n + 1];
         adjList = new HashMap<>();
-        Deque<Integer> queue = new ArrayDeque<>();
-        int[] answer = new int[n + 1];
-        int count = 0;
+        visited = new boolean[n + 1];
+        List<int[]> result = new ArrayList<>();
         
+        // 간선 정보 초기화
         for (int i = 1; i <= n; i++) {
             adjList.put(i, new ArrayList<>());
         }
         
-        for (int i = 0; i < edge.length; i++) {
-		        // 양방향 간선 정보 추가
-            adjList.get(edge[i][0]).add(edge[i][1]);
-            adjList.get(edge[i][1]).add(edge[i][0]);
+        // 간선 정보 연결
+        for (int[] v : edge) {
+            adjList.get(v[0]).add(v[1]);
+            adjList.get(v[1]).add(v[0]);
         }
-
-        queue.offer(1);
+        
+        // 1: [3, 2]
+        // 2: [1, 4, 3, 5]
+        // 3: [1, 6, 2, 4]
+        // 4: [2, 3]
+        // 5: [2]
+        // 6: [3]
+        
+        Deque<int[]> queue = new ArrayDeque<>();
+        queue.offer(new int[]{1, 0});
         visited[1] = true;
         
+        int far = 0;
         while (!queue.isEmpty()) {
-            int currentNode = queue.poll();
-            for (int next : adjList.get(currentNode)) {
-                if (!visited[next]) {
-		                // 현재 노드 차수에서 1만큼 증가한 값을 다음 노드의 최단거리로 저장
-                    answer[next] = answer[currentNode] + 1;
-                    queue.add(next);
-                    visited[next] = true;
+            int[] currentVertex = queue.poll();
+            
+            for (int a : adjList.get(currentVertex[0])) {
+                if (!visited[a]) {
+                    queue.offer(new int[]{a, currentVertex[1] + 1});
+                    far = currentVertex[1] + 1;
+                    result.add(new int[]{a, currentVertex[1] + 1});
+                    visited[a] = true;
                 }
             }
         }
         
-        int maxValue = 0;
-        
-        for (int value : answer) {
-            if (value > maxValue) {
-                maxValue = value;
-            }
-        }
-        
-        for (int value : answer) {
-            if (value == maxValue) {
+        int count = 0;
+        for (int[] a : result) {
+            if (a[1] == far) {
                 count++;
             }
         }
-        
         return count;
     }
 }
