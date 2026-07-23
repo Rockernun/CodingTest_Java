@@ -1,78 +1,71 @@
 import java.util.*;
 
 class Solution {
-    
-    static String[] newWords;
-    static Map<Integer, List<Integer>> adjList;
-    static boolean[] visited;
-    
+
+    Map<String, List<String>> adjList;
+    Set<String> visited;
+    int answer = Integer.MAX_VALUE;
+
     public int solution(String begin, String target, String[] words) {
+
+        // target이 없는 경우
+        if (!Arrays.asList(words).contains(target)) {
+            return 0;
+        }
+
+        List<String> wordList = new ArrayList<>();
+        wordList.add(begin);
+        wordList.addAll(Arrays.asList(words));
+
         adjList = new HashMap<>();
-        newWords = new String[words.length + 1];
-        newWords[0] = begin;
-        
-        for (int i = 1; i < newWords.length; i++) {
-            newWords[i] = words[i - 1];
-        }
-        
-        System.out.println(Arrays.toString(newWords));
+        visited = new HashSet<>();
 
-        visited = new boolean[newWords.length];
-        
-        for (int i = 0; i < newWords.length; i++) {
-            adjList.put(i, new ArrayList<>());
+        for (String word : wordList) {
+            adjList.put(word, new ArrayList<>());
         }
 
-        for (int i = 0; i < newWords.length - 1; i++) {
-            for (int j = i + 1; j < newWords.length; j++) {
-                if (findAdjcentElement(newWords[i], newWords[j])) {
-                    adjList.get(i).add(j);
-                    adjList.get(j).add(i);
+        // 한 글자 차이나는 단어끼리 연결
+        for (String word1 : wordList) {
+            for (String word2 : words) {
+                if (isDiffOneChar(word1, word2)) {
+                    adjList.get(word1).add(word2);
                 }
             }
         }
-        
-        return bfs(0, target);
+
+        dfs(begin, target, 0);
+
+        return answer == Integer.MAX_VALUE ? 0 : answer;
     }
-    
-    private int bfs(int startIndex, String target) {
-        Deque<Integer> queue = new ArrayDeque<>();
-        int[] count = new int[newWords.length];
-        queue.offer(startIndex);
-        visited[startIndex] = true;
-        
-        while (!queue.isEmpty()) {
-            int current = queue.poll();
-            
-            if (newWords[current].equals(target)) {
-                return count[current];
-            }
-            
-            for (int next : adjList.get(current)) {
-                if (!visited[next]) {
-                    count[next] = count[current] + 1;
-                    queue.offer(next);
-                    visited[next] = true;           
-                }
+
+    private void dfs(String current, String target, int depth) {
+
+        if (current.equals(target)) {
+            answer = Math.min(answer, depth);
+            return;
+        }
+
+        visited.add(current);
+
+        for (String next : adjList.get(current)) {
+            if (!visited.contains(next)) {
+                dfs(next, target, depth + 1);
             }
         }
-        
-        return 0;
+
+        visited.remove(current);
     }
-    
-    private boolean findAdjcentElement(String currentWord, String nextWord) {
-        int count = 0;
-        
-        for (int i = 0; i < currentWord.length(); i++) {
-            if (currentWord.charAt(i) != nextWord.charAt(i)) {
-                count++;
+
+    private boolean isDiffOneChar(String str1, String str2) {
+
+        int diff = 0;
+
+        for (int i = 0; i < str1.length(); i++) {
+            if (str1.charAt(i) != str2.charAt(i)) {
+                diff++;
             }
         }
-        
-        if (count == 1) {
-            return true;
-        }
-        
-        return false;
+
+        return diff == 1;
     }
 }
