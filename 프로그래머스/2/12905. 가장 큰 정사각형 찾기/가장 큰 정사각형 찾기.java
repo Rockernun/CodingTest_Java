@@ -4,12 +4,14 @@ class Solution {
         for (int i = 0; i < board.length; i++) {
             if (board[i][0] == 1) {
                 max = 1;
+                break;
             }
         }
         
         for (int i = 0; i < board[0].length; i++) {
             if (board[0][i] == 1) {
                 max = 1;
+                break;
             }
         }
         
