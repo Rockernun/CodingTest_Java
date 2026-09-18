@@ -12,10 +12,9 @@ class Solution {
             triples[i] = i * 3;
         }
         
-        // dp 초기화
         for (int i = 1; i <= target; i++) {
-            dp[i][0] = Integer.MAX_VALUE;  // 최소로 다트를 던져서 타겟 점수를 만들 수 있는 경우의 수
-            dp[i][1] = 0;  // 싱글 + 불 횟수
+            dp[i][0] = Integer.MAX_VALUE;
+            dp[i][1] = 0;
         }
         
         for (int i = 1; i <= target; i++) {
@@ -35,18 +34,19 @@ class Solution {
         return dp[target];
     }
     
-    private void update(int[][] dp, int i, int score, boolean isSingleOrBull) {
-        int prev = i - score;
+    private void update(int[][] dp, int current, int score, boolean isSingleOrBull) {
+        int prev = current - score;
         
-        if (prev < 0) return;
-        if (dp[prev][0] == Integer.MAX_VALUE) return;
+        if (prev < 0 || dp[prev][0] == Integer.MAX_VALUE) {
+            return;
+        }
         
-        int darts = dp[prev][0] + 1;
+        int throwCount = dp[prev][0] + 1;
         int singleOrBullCount = dp[prev][1] + (isSingleOrBull ? 1 : 0);
         
-        if (darts < dp[i][0] || (darts == dp[i][0] && singleOrBullCount > dp[i][1])) {
-            dp[i][0] = darts;
-            dp[i][1] = singleOrBullCount;
+        if (throwCount < dp[current][0] || (throwCount == dp[current][0] && singleOrBullCount > dp[current][1])) {
+            dp[current][0] = throwCount;
+            dp[current][1] = singleOrBullCount;
         }
     }
 }
