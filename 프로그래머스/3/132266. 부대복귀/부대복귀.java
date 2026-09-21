@@ -1,51 +1,54 @@
-import java.util.*;
+import java.util.Arrays;
 
 class Solution {
-    
-    static Map<Integer, List<Integer>> adjList;
-    static boolean[] visited;
-    
     public int[] solution(int n, int[][] roads, int[] sources, int destination) {
-        adjList = new HashMap<>();
-        int[] answer = new int[sources.length];
-        
-        for (int i = 1; i <= n; i++) {
-            adjList.put(i, new ArrayList<>());
-        }
+        int[] degree = new int[n + 1];
+        int[] head = new int[n + 2];
         
         for (int[] road : roads) {
-            adjList.get(road[0]).add(road[1]);
-            adjList.get(road[1]).add(road[0]);
+            degree[road[0]]++;
+            degree[road[1]]++;
         }
         
-        for (int i = 0; i < sources.length; i++) {
-            answer[i] = bfs(n, sources[i], destination);
+        for (int i = 1; i <= n; i++) {
+            head[i + 1] = head[i] + degree[i];
         }
         
-        return answer;
-    }
-    
-    private int bfs(int n, int start, int destination) {
-        visited = new boolean[n + 1];
-        Deque<int[]> queue = new ArrayDeque<>();
-        queue.offer(new int[]{start, 0});
-        visited[start] = true;
+        int[] adj = new int[roads.length * 2];
+        int[] pos = head.clone();
         
-        while (!queue.isEmpty()) {
-            int[] poll = queue.poll();
+        for (int[] road : roads) {
+            adj[pos[road[0]]++] = road[1];
+            adj[pos[road[1]]++] = road[0];
+        }
         
-            if (poll[0] == destination) {
-                return poll[1];
-            }
+        int[] dist = new int[n + 1];
+        Arrays.fill(dist, -1);
+        dist[destination] = 0;
+        
+        int[] queue = new int[n + 1];
+        int front = 0;
+        int rear = 0;
+        queue[rear++] = destination;
+        
+        while (front < rear) {
+            int current = queue[front++];
             
-            for (int adj : adjList.get(poll[0])) {
-                if (!visited[adj]) {
-                    queue.offer(new int[]{adj, poll[1] + 1});
-                    visited[adj] = true;
+            for (int i = head[current]; i < head[current + 1]; i++) {
+                int next = adj[i];
+                if (dist[next] == -1) {
+                    dist[next] = dist[current] + 1;
+                    queue[rear++] = next;
                 }
             }
         }
         
-        return -1;
+        int[] answer = new int[sources.length];
+        
+        for (int i = 0; i < sources.length; i++) {
+            answer[i] = dist[sources[i]];
+        }
+        
+        return answer;
     }
 }
