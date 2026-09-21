@@ -1,74 +1,55 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 class Solution {
-    
-    static class Ticket {
-        String departure;
-        String arrival;
+    Map<String, List<int[]>> adjList;
+    String[][] tickets;
+    boolean[] used;
+    List<String> result;
 
-        public Ticket(String departure, String arrival) {
-            this.departure = departure;
-            this.arrival = arrival;
-        }
-    }
-
-    private Ticket[] ticketList;
-    private boolean[] used;
-    private List<String> path;
-    private List<String> answer;
-
-    public List<String> solution(String[][] tickets) {
-        ticketList = new Ticket[tickets.length];
-        for (int i = 0; i < tickets.length; i++) {
-            ticketList[i] = new Ticket(tickets[i][0], tickets[i][1]);
-        }
-
-        Arrays.sort(ticketList, (a, b) -> {
-            if (!a.departure.equals(b.departure)) {
-                return a.departure.compareTo(b.departure);
-            }
-
-            return a.arrival.compareTo(b.arrival);
-        });
-
+    public String[] solution(String[][] tickets) {
+        this.tickets = tickets;
         used = new boolean[tickets.length];
-        path = new ArrayList<>();
-        answer = null;
+        adjList = new HashMap<>();
 
-        path.add("ICN");
-        dfs("ICN", 0);
-        return answer;
-    }
-
-    private boolean dfs(String current, int count) {
-        if (count == ticketList.length) {
-            answer = new ArrayList<>(path);
-            return true;
+        for (int i = 0; i < tickets.length; i++) {
+            adjList.putIfAbsent(tickets[i][0], new ArrayList<>());
+            adjList.get(tickets[i][0]).add(new int[]{i});
         }
 
-        for (int i = 0; i < ticketList.length; i++) {
-            if (used[i]) {
-                continue;
-            }
+        for (String key : adjList.keySet()) {
+            adjList.get(key).sort((a, b) ->
+                tickets[a[0]][1].compareTo(tickets[b[0]][1])
+            );
+        }
 
-            Ticket ticket = ticketList[i];
-            if (!ticket.departure.equals(current)) {
-                continue;
-            }
+        result = null;
+        List<String> path = new ArrayList<>();
+        path.add("ICN");
+        dfs("ICN", path);
 
-            used[i] = true;
-            path.add(ticket.arrival);
+        return result.toArray(new String[0]);
+    }
 
-            if (dfs(ticket.arrival, count + 1)) {
-                return true;
-            }
+    private void dfs(String current, List<String> path) {
+        if (path.size() == tickets.length + 1) {
+            if (result == null) result = new ArrayList<>(path);
+            return;
+        }
+        if (!adjList.containsKey(current)) return;
+
+        for (int[] entry : adjList.get(current)) {
+            int ticketIdx = entry[0];
+            if (used[ticketIdx]) continue; 
+
+            used[ticketIdx] = true;  
+            String dest = tickets[ticketIdx][1];
+            path.add(dest);
+
+            dfs(dest, path);
+            if (result != null) return; 
 
             path.remove(path.size() - 1);
-            used[i] = false;
+            used[ticketIdx] = false;
         }
-
-        return false;
     }
 }
