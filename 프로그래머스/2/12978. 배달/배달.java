@@ -1,60 +1,51 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.util.*;
 
 class Solution {
-    private static class Node {
-        int destination;
-        int cost;
-
-        public Node(int destination, int cost) {
-            this.destination = destination;
-            this.cost = cost;
-        }
-    }
-
+    
+    Map<Integer, List<int[]>> adjList;
+    int[] dist;
+    
     public int solution(int N, int[][] road, int K) {
-        List<Node>[] adjacentVillages = new ArrayList[N + 1];
-
-        for (int i = 1; i <= N; i++) {
-            adjacentVillages[i] = new ArrayList<>();
-        }
-
-        for (int[] roadInfo : road) { 
-            adjacentVillages[roadInfo[0]].add(new Node(roadInfo[1], roadInfo[2]));
-            adjacentVillages[roadInfo[1]].add(new Node(roadInfo[0], roadInfo[2]));
-        }
-        
-        int[] dist = new int[N + 1];
+        int answer = 0;
+        adjList = new HashMap<>();
+        dist = new int[N + 1];
         Arrays.fill(dist, Integer.MAX_VALUE);
         
-        PriorityQueue<Node> pq = new PriorityQueue<>(Comparator.comparingInt(o -> o.cost));
-        pq.add(new Node(1, 0));
-        dist[1] = 0; 
-        
-        while (!pq.isEmpty()) {
-            Node currentVillage = pq.poll();
-            if (dist[currentVillage.destination] < currentVillage.cost) {
-                continue;
-            }
-            
-            for (Node nextVillage : adjacentVillages[currentVillage.destination]) {
-                if (dist[nextVillage.destination] > currentVillage.cost + nextVillage.cost) {
-                    dist[nextVillage.destination] = currentVillage.cost + nextVillage.cost;
-                    pq.add(new Node(nextVillage.destination, dist[nextVillage.destination]));
-                }
-            }
-        }
-        
-        int result = 0;
         for (int i = 1; i <= N; i++) {
-            if (dist[i] <= K) {
-                result++;
+            adjList.put(i, new ArrayList<>());
+        }
+        
+        for (int[] r : road) {
+            int village1 = r[0];
+            int village2 = r[1];
+            int time = r[2];
+            
+            adjList.get(village1).add(new int[]{village2, time});
+            adjList.get(village2).add(new int[]{village1, time});
+        }
+        
+        Deque<int[]> queue = new ArrayDeque<>();
+        queue.offer(new int[]{1, 0});  // 현재 마을, 걸린 시간
+        dist[1] = 0;
+        
+        while (!queue.isEmpty()) {
+            int[] current = queue.poll();  // [현재 마을, 현재 마을까지 걸린 시간]
+            
+            if (current[1] > dist[current[0]]) continue;
+            
+            for (int[] next : adjList.get(current[0])) {
+                int addedTime = current[1] + next[1];
+                if (addedTime > K || addedTime >= dist[next[0]]) continue;
+                queue.offer(new int[]{next[0], addedTime});
+                dist[next[0]] = addedTime;
             }
         }
         
-        return result;
+        for (int i = 1; i <= N; i++) {
+            if (dist[i] > K) continue;
+            answer++;
+        }
+        
+        return answer;
     }
 }
