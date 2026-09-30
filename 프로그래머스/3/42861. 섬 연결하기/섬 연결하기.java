@@ -1,44 +1,45 @@
-import java.util.Arrays;
+import java.util.*;
 
 class Solution {
-    public static void union(int[] parent, int x, int y) {
-        x = find(parent, x);
-        y = find(parent, y);
-
-        if (x < y) {
-            parent[y] = x;
-        } else {
-            parent[x] = y;
+    
+    Map<Integer, List<int[]>> adjList;
+    boolean[] visited;
+    
+    public int solution(int n, int[][] costs) {
+        int answer = 0;
+        adjList = new HashMap<>();
+        visited = new boolean[n];
+        
+        for (int i = 0; i < n; i++) {
+            adjList.put(i, new ArrayList<>());
         }
-    }
-
-    public static int find(int[] parent, int x) {
-        if (parent[x] == x) {
-            return x;
-        } else {
-            return find(parent, parent[x]);
+        
+        for (int[] c : costs) {
+            int node1 = c[0];
+            int node2 = c[1];
+            int cost = c[2];
+            
+            adjList.get(node1).add(new int[]{node2, cost});
+            adjList.get(node2).add(new int[]{node1, cost});
         }
-    }
-
-    public static int kruskal(int[][] costs, int[] parent) {
-        int cost = 0;
-        for (int i = 0; i < costs.length; i++) {
-            if (find(parent, costs[i][0]) != find(parent, costs[i][1])) {
-                cost += costs[i][2];
-                union(parent, costs[i][0], costs[i][1]);
+        
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> Integer.compare(a[1], b[1]));
+        pq.offer(new int[]{0, 0});
+        
+        while (!pq.isEmpty()) {
+            int[] current = pq.poll();
+            
+            if (visited[current[0]]) continue;
+            answer += current[1];
+            visited[current[0]] = true;
+            
+            for (int[] next : adjList.get(current[0])) {
+                if (!visited[next[0]]) {
+                    pq.offer(new int[]{next[0], next[1]});
+                }
             }
         }
-        return cost;
-    }
-
-    public int solution(int n, int[][] costs) {
-        Arrays.sort(costs, (o1, o2) -> o1[2] - o2[2]);
         
-        int[] parent = new int[n];
-        for (int i = 0; i < n; i++) {
-            parent[i] = i;
-        }
-        
-        return kruskal(costs, parent);  
+        return answer;
     }
 }
