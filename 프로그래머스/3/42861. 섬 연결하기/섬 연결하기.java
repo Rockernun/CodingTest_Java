@@ -25,13 +25,15 @@ class Solution {
         
         PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> Integer.compare(a[1], b[1]));
         pq.offer(new int[]{0, 0});
+        visited[0] = true;
         
         while (!pq.isEmpty()) {
             int[] current = pq.poll();
             
-            if (visited[current[0]]) continue;
-            answer += current[1];
-            visited[current[0]] = true;
+            if (!visited[current[0]]) {
+                answer += current[1];
+                visited[current[0]] = true;   
+            }
             
             for (int[] next : adjList.get(current[0])) {
                 if (!visited[next[0]]) {
