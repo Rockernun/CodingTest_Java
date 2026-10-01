@@ -1,41 +1,48 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 class Solution {
-    private static final String ENTER = "Enter";
-    private static final String LEAVE = "Leave";
-    private static final String CHANGE = "Change";
-    private static List<String> resultList = new ArrayList<>();
     
-    public static List<String> solution(String[] record) {
-        Map<String, String> userInfo = new HashMap<>();
-        
-        for (String command : record) {
-            String[] splitCommand = command.split(" ");
-            
-            if (splitCommand[0].equals(ENTER)) {
-                userInfo.put(splitCommand[1], splitCommand[2]);
-            }
-            
-            if (splitCommand[0].equals(CHANGE)) {
-                userInfo.put(splitCommand[1], splitCommand[2]);
+    Map<String, List<String>> info;
+    
+    public String[] solution(String[] record) {
+        info = new HashMap<>();
+        int count = 0;
+         
+        for (String s : record) {
+            String[] split = s.split(" ");
+            if (!info.keySet().contains(split[1])) {
+                info.put(split[1], new ArrayList<>());
             }
         }
         
-        for (String command : record) {
-            String[] commands = command.split(" ");
-            
-            if (commands[0].equals(ENTER)) {
-                resultList.add(userInfo.get(commands[1]) + "님이 들어왔습니다.");
-            }
-            
-            if (commands[0].equals(LEAVE)) {
-                resultList.add(userInfo.get(commands[1]) + "님이 나갔습니다.");
+        for (String s : record) {
+            String[] split = s.split(" ");
+            String command = split[0];
+            if (command.equals("Enter")) {
+                info.get(split[1]).add(split[2]);
+                count++;
+            } else if (command.equals("Change")) {
+                info.get(split[1]).add(split[2]);
+            } else if (command.equals("Leave")) {
+                count++;
             }
         }
         
-        return resultList;
+        String[] result = new String[count];
+        int index = 0;
+        
+        for (int i = 0; i < record.length; i++) {
+            String[] s = record[i].split(" ");
+            String command = s[0];
+            String uuid = s[1];
+            
+            if (command.equals("Enter")) {
+                result[index++] = info.get(uuid).get(info.get(uuid).size() - 1) + "님이 들어왔습니다.";
+            } else if (command.equals("Leave")) {
+                result[index++] = info.get(uuid).get(info.get(uuid).size() - 1) + "님이 나갔습니다.";
+            }
+        }
+        
+        return result;
     }
 }
