@@ -1,58 +1,50 @@
-// 하나의 큐에서 하나 뽑아서 다른 큐에 넣음(이 작업을 1번이라고 설정)
-// 최소 몇 번을 해야 두 큐의 원소의 합이 같아지는가?
 import java.util.Deque;
 import java.util.ArrayDeque;
 
 class Solution {
     public int solution(int[] queue1, int[] queue2) {
-        int answer = 0;
-        int maxCount = queue1.length * 3;
-        // 두 큐의 모든 원소의 합을 일단 구함
-        long sum1 = 0;
-        long sum2 = 0;
+        Deque<Integer> q1 = new ArrayDeque<>();
+        Deque<Integer> q2 = new ArrayDeque<>();
+        int count = 0;
+        
+        long totalQ1 = 0L, totalQ2 = 0L;
+
         for (int i = 0; i < queue1.length; i++) {
-            sum1 += queue1[i];
-            sum2 += queue2[i];
+            q1.offer(queue1[i]);
+            q2.offer(queue2[i]);
+            totalQ1 += queue1[i];
+            totalQ2 += queue2[i];
         }
         
-        // 만약 sum1 + sum2가 홀수이면 합을 같게 할 수 없음
-        if ((sum1 + sum2) % 2 == 1) {
-            return -1;
-        }
+        long mid = (totalQ1 + totalQ2) / 2;
+        int limit = queue1.length * 4;
         
-        // 하나의 원소가 sum1 + sum2 / 2보다 큰 경우 -1 반환
-        for (int i = 0; i < queue1.length; i++) {
-            long middle = (sum1 + sum2) / 2;
-            if (queue1[i] > middle || queue2[i] > middle) {
-                return -1;
+        while (totalQ1 != mid) {
+            if (count > limit) {
+                count = -1;
+                break;
             }
-        }
-        
-        Deque<Integer> deque1 = new ArrayDeque<>();
-        Deque<Integer> deque2 = new ArrayDeque<>();
-        
-        for (int i = 0; i < queue1.length; i++) {
-            deque1.offer(queue1[i]);
-            deque2.offer(queue2[i]);
-        }
-        
-        // 두 큐의 원소들의 합이 같지 않을 동안
-        while (sum1 != sum2 && answer <= maxCount) {
-            // 합이 더 큰 큐에서 하나 뺴서 다른 큐에 집어 넣고 answer를 1만큼 증가
-            if (sum1 > sum2) {
-                int poll = deque1.poll();
-                deque2.offer(poll);
-                sum1 -= poll;
-                sum2 += poll;
-                answer++;
-            } else if (sum1 < sum2) {
-                int poll = deque2.poll();
-                deque1.offer(poll);
-                sum1 += poll;
-                sum2 -= poll;
-                answer++;
+            
+            if (totalQ1 == mid) {
+                return count;
             }
+            
+            if (totalQ1 < mid && q2.size() > 1) {
+                int poll = q2.poll();
+                q1.offer(poll);
+                totalQ1 += poll;
+            } else if (totalQ1 > mid && q1.size() > 1) {
+                int poll = q1.poll();
+                q2.offer(poll);
+                totalQ1 -= poll;
+            } else {
+                count = -1;
+                break;
+            }
+            
+            count++;
         }
-        return (sum1 != sum2) ? -1 : answer;
+        
+        return count;
     }
 }
