@@ -1,54 +1,50 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-public class Solution {
-
-    public List<Integer> solution(String[] genres, int[] plays) {
-        Map<String, Integer> eachGenreTotalPlaySongs = new HashMap<>();
-        Map<String, List<int[]>> playedSongsByGenre = new HashMap<>();
+class Solution {   
+    public int[] solution(String[] genres, int[] plays) {
+        List<Integer> result = new ArrayList<>();  // 결과를 담을 리스트
+        Map<String, Integer> genresCount = new HashMap<>();  // 각 장르 노래가 재생된 총합
+        
         for (int i = 0; i < genres.length; i++) {
-            String genre = genres[i];
-            int play = plays[i];
-
-            if (eachGenreTotalPlaySongs.containsKey(genre)) {
-                eachGenreTotalPlaySongs.put(genre, eachGenreTotalPlaySongs.get(genre) + play);
-                playedSongsByGenre.get(genre).add(new int[]{i, play});
-            } else {
-                eachGenreTotalPlaySongs.put(genre, play);
-                List<int[]> list = new ArrayList<>();
-                list.add(new int[]{i, play});
-                playedSongsByGenre.put(genre, list);
-            }
+            genresCount.put(genres[i], genresCount.getOrDefault(genres[i], 0) + plays[i]);
         }
         
-        List<Map.Entry<String, Integer>> sortedGenrePlays = new ArrayList<>(eachGenreTotalPlaySongs.entrySet());
-        sortedGenrePlays.sort((a, b) -> b.getValue().compareTo(a.getValue()));
+        // 각 장르 노래가 재생된 총합을 기준으로 내림차순 (모든 장르는 재생된 횟수가 다르기 때문에 가능)
+        List<Integer> countDesc = new ArrayList<>();
+        for (int songs : genresCount.values()) {
+            countDesc.add(songs);
+        }
         
-        List<Integer> list = new ArrayList<>();
-        for (Map.Entry<String, Integer> entry : sortedGenrePlays) {
-            String genre = entry.getKey();
-            List<int[]> genreIndexPlayList = playedSongsByGenre.get(genre);
+        Collections.sort(countDesc, Collections.reverseOrder());
+        
+        // 장르 노래가 재생된 총합이 같은 장르를 sortedGenres에 삽입
+        List<String> sortedGenres = new ArrayList<>(genresCount.keySet());
+        sortedGenres.sort((a, b) -> Integer.compare(genresCount.get(b), genresCount.get(a)));   // 총 재생 수 내림차순
+        
+        // 속한 노래가 많이 재생된 장르 순으로 정렬되어 있는 sortedGenres를 순회하면서
+        for (int i = 0; i < sortedGenres.size(); i++) {
+            List<int[]> list = new ArrayList<>();
+            String currentGenre = sortedGenres.get(i);
             
-            genreIndexPlayList.sort((a, b) -> {
-                if (b[1] != a[1]) {
-                    return b[1] - a[1];
-                } else {
-                    return a[0] - b[0];
+            for (int g = 0; g < genres.length; g++) {
+                if (genres[g].equals(currentGenre)) {
+                    list.add(new int[]{g, plays[g]});
                 }
+            }
+            
+            list.sort((a, b) -> {
+                if (a[1] != b[1]) return Integer.compare(b[1], a[1]);
+                return Integer.compare(a[0], b[0]);
             });
             
-            int genreSongCount = 0;
-            for (int[] playedSong : genreIndexPlayList) {
-                if (genreSongCount >= 2) {
-                    break;
-                }
-                
-                list.add(playedSong[0]);
-                genreSongCount++;
+            if (list.size() > 1) {
+                result.add(list.get(0)[0]);
+                result.add(list.get(1)[0]);
+            } else {
+                result.add(list.get(0)[0]);
             }
         }
-        return list;
+         
+        return result.stream().mapToInt(i -> i).toArray();
     }
 }
