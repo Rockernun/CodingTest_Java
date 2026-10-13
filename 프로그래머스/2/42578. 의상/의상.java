@@ -5,13 +5,9 @@ class Solution {
     public int solution(String[][] clothes) {
         Map<String, Integer> clothesInfo = new HashMap<>();
         int answer = 1;
-        for (String[] clothesAndCategory : clothes) {
-            clothesInfo.put(clothesAndCategory[1], clothesInfo.getOrDefault(clothesAndCategory[1], 1) + 1);
-        }
         
-        for (int clothesCounts : clothesInfo.values()) {
-            answer *= clothesCounts;
-        }
+        for (String[] c : clothes) clothesInfo.put(c[1], clothesInfo.getOrDefault(c[1], 1) + 1);
+        for (int c : clothesInfo.values()) answer *= c;
         
         return answer - 1;
     }
