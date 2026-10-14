@@ -1,50 +1,36 @@
 import java.util.*;
 
 class Solution {
-    
-    Map<String, Integer> termsValidityPeriod = new HashMap<>();
-    
     public int[] solution(String today, String[] terms, String[] privacies) {
-        for (String s : terms) {
-            String[] split = s.split(" ");
-            String term = split[0];
-            int validityPeriod = Integer.parseInt(split[1]);
-            termsValidityPeriod.put(term, validityPeriod);
+        Map<String, String> termInfo = new HashMap<>();
+        
+        for (String t : terms) {
+            String[] split = t.split(" ");
+            termInfo.put(split[0], split[1]);
         }
         
-        List<Integer> result = new ArrayList<>();
-        int todayDays = convertToDays(today);
+        List<Integer> answer = new ArrayList<>();
+        
+        String[] split1 = today.split("\\.");
+        
+        int todayToInt = 0;
+        todayToInt += Integer.parseInt(split1[0]) * 12 * 28;
+        todayToInt += Integer.parseInt(split1[1]) * 28;
+        todayToInt += Integer.parseInt(split1[2]);
         
         for (int i = 0; i < privacies.length; i++) {
-            String[] split = privacies[i].split(" ");
+            int day = 0;
+            String[] split2 = privacies[i].split(" ");
+            String[] split3 = split2[0].split("\\.");
             
-            String startDate = split[0];
-            String term = split[1];
+            day += Integer.parseInt(split3[0]) * 12 * 28;
+            day += Integer.parseInt(split3[1]) * 28;
+            day += Integer.parseInt(split3[2]);
+            day += Integer.parseInt(termInfo.get(split2[1])) * 28;
             
-            int startDays = convertToDays(startDate);
-            int validityPeriod = termsValidityPeriod.get(term);
-            
-            int expireDays = startDays + validityPeriod * 28;
-            
-            if (todayDays >= expireDays) {
-                result.add(i + 1);
-            }
+            if (day <= todayToInt) answer.add(i + 1);
         }
         
-        int[] answer = new int[result.size()];
-        
-        for (int i = 0; i < result.size(); i++) {
-            answer[i] = result.get(i);
-        }
-        
-        return answer;
-    }
-    
-    private int convertToDays(String date) {
-        int year = Integer.parseInt(date.substring(0, 4));
-        int month = Integer.parseInt(date.substring(5, 7));
-        int day = Integer.parseInt(date.substring(8, 10));
-        
-        return year * 12 * 28 + month * 28 + day;
+        return answer.stream().mapToInt(i -> i).toArray();
     }
 }
