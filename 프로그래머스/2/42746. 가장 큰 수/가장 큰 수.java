@@ -2,21 +2,20 @@ import java.util.Arrays;
 
 class Solution {
     public String solution(int[] numbers) {
-        String answer = "";
-        String[] numberToStringArray = new String[numbers.length];
-        for (int i = 0; i < numbers.length; i++) {
-            numberToStringArray[i] = numbers[i] + "";
+        String[] strNumbers = new String[numbers.length];
+        StringBuilder sb = new StringBuilder();
+
+        for (int n = 0; n < numbers.length; n++) {
+            strNumbers[n] = String.valueOf(numbers[n]);
         }
         
-        Arrays.sort(numberToStringArray, (s1, s2) -> (s2 + s1).compareTo(s1 + s2));
-        for (String s : numberToStringArray) {
-            answer += s;
+        Arrays.sort(strNumbers, (a, b) -> (b + a).compareTo(a + b));
+        
+        for (int n = 0; n < strNumbers.length; n++) {
+            sb.append(strNumbers[n]);
         }
         
-        if (numberToStringArray[0].equals("0")) {
-            return "0";
-        }
-        
-        return answer;
+        if (sb.toString().charAt(0) == '0') return "0";
+        return sb.toString();
     }
 }
