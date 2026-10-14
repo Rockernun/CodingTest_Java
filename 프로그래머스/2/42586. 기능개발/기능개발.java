@@ -2,27 +2,42 @@ import java.util.*;
 
 class Solution {
     public int[] solution(int[] progresses, int[] speeds) {
-        Deque<Integer> queue = new ArrayDeque<>();
         List<Integer> answer = new ArrayList<>();
+        Deque<int[]> queue = new ArrayDeque<>();
         
         for (int i = 0; i < progresses.length; i++) {
-            int day = (100 - progresses[i]) / speeds[i];
-            if ((100 - progresses[i]) % speeds[i] != 0) {
-                day++;
-            }
-            queue.offer(day);
+            queue.offer(new int[]{progresses[i], speeds[i]});
         }
         
         while (!queue.isEmpty()) {
-            int count = 1;
-            int first = queue.poll();
+            int[] first = queue.poll();
+            int remain = 100 - first[0];
+            int day = 0;
             
-            while (!queue.isEmpty() && first >= queue.peekFirst()) {
-                int poll = queue.poll();
+            if (remain % first[1] == 0) {
+                day += remain / first[1];
+            } else {
+                day += remain / first[1] + 1;
+            }
+            
+            if (!queue.isEmpty()) {
+                for (int i = 0; i < queue.size(); i++) {
+                    int[] poll = queue.poll();
+                    poll[0] += poll[1] * day;
+                    queue.offer(poll);
+                }
+            }
+            
+            // 큐에 들어있는 첫 번째 기능이 완성되어 있을 동안
+            int count = 1;
+            while (!queue.isEmpty() && queue.peekFirst()[0] >= 100) {
+                queue.removeFirst();
                 count++;
             }
+            
             answer.add(count);
         }
+        
         return answer.stream().mapToInt(i -> i).toArray();
     }
 }
