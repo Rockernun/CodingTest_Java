@@ -5,31 +5,28 @@ class Solution {
     public int solution(int bridge_length, int weight, int[] truck_weights) {
         Deque<Integer> queue1 = new ArrayDeque<>();
         Deque<Integer> queue2 = new ArrayDeque<>();
-        for (int i = 0; i < bridge_length; i++) {
-            queue1.offer(0);
-        }
-        
-        for (int w : truck_weights) {
-            queue2.offer(w);
-        }
-        
-        int totalWeight = 0;
         int time = 0;
         
-        while (!queue1.isEmpty()) {
-            int q1 = queue1.poll();
-            totalWeight -= q1;
+        for (int i = 1; i <= bridge_length; i++) queue1.offer(0);
+        for (int i = 0; i < truck_weights.length; i++) queue2.offer(truck_weights[i]);
+        
+        while (!queue2.isEmpty()) {
+            int sum = 0;
+            int firstTruck = queue2.peekFirst();
+            queue1.poll();
             
-            if (!queue2.isEmpty()) {
-                if (queue2.peekFirst() + totalWeight > weight) {
-                    queue1.offer(0);
-                } else {
-                    int q2 = queue2.poll();
-                    queue1.offer(q2);
-                    totalWeight += q2;
-                }
+            for (int n : queue1) sum += n;
+            if (sum + firstTruck > weight) {
+                queue1.offer(0);
+            } else {
+                queue1.offer(queue2.poll());
             }
             
+            time++;
+        }
+        
+        while (!queue1.isEmpty()) {
+            queue1.poll();
             time++;
         }
         
