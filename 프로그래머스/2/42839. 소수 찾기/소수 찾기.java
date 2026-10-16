@@ -1,66 +1,44 @@
-import java.util.*;
+import java.util.Set;
+import java.util.HashSet;
 
 class Solution {
     
-    Set<Integer> output;
-    List<Character> charList;
     boolean[] visited;
+    Set<Integer> count;
     StringBuilder sb;
     
     public int solution(String numbers) {
+        int n = numbers.length();
+        String[] splitNumbers = numbers.split("");
+        visited = new boolean[n];
+        count = new HashSet<>();
+        sb = new StringBuilder();
+        dfs(splitNumbers);
         
-        charList = new ArrayList<>();
-        output = new HashSet<>();
-        
-        for (int i = 0; i < numbers.length(); i++) {
-            charList.add(numbers.charAt(i));
-        }
-        
-        for (int i = 1; i < charList.size() + 1; i++) {
-            visited = new boolean[charList.size()];
-            permutation(new ArrayList<>(), i, charList);
-        }
-        
-        return output.size();
+        return count.size();
     }
     
-    private void permutation(List<Character> current, int r, List<Character> charList) {
-        
-        if (current.size() == r) {
-            sb = new StringBuilder();
-            
-            for (int i = 0; i < current.size(); i++) {
-                sb.append(current.get(i));
-            }
-            
-            if (isPrime(Integer.parseInt(sb.toString()))) {
-                output.add(Integer.parseInt(sb.toString()));
-            }
-            
-            return;
+    private void dfs(String[] numbers) {
+        if (sb.length() != 0) {
+            int currentNumber = Integer.parseInt(sb.toString());
+            if (isPrimeNumber(currentNumber)) count.add(currentNumber);
         }
         
-        for (int i = 0; i < charList.size(); i++) {
-            if (!visited[i]) {
-                current.add(charList.get(i));
-                visited[i] = true;
-                permutation(current, r, charList);
-                current.remove(current.size() - 1);
-                visited[i] = false;
-            }
+        for (int i = 0; i < numbers.length; i++) {
+            if (visited[i]) continue;
+            visited[i] = true;
+            sb.append(numbers[i]);
+            dfs(numbers);
+            visited[i] = false;
+            sb.deleteCharAt(sb.length() - 1);
         }
     }
     
-    // 소수 판별 메서드
-    private boolean isPrime(int number) {
-        if (number < 2) {
-            return false;
-        }
+    private boolean isPrimeNumber(int number) {
+        if (number < 2) return false;
         
-        for (int i = 2; i * i <= number; i++) {
-            if (number % i == 0) {
-                return false;
-            }
+        for (int i = 2; i <= Math.sqrt(number); i++) {
+            if (number % i == 0) return false;
         }
         
         return true;
