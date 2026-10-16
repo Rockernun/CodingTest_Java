@@ -9,13 +9,13 @@ class Solution {
         output = new int[n][2];
         visited = new boolean[n];
         
-        permutation(dungeons, 0, n, n, k);
+        permutation(dungeons, 0, n, k);
         return max;
     }
     
     // 순열 메서드
-    private void permutation(int[][] dungeons, int depth, int n, int r, int k) {
-        if (depth == r) {
+    private void permutation(int[][] dungeons, int depth, int n, int k) {
+        if (depth == n) {
             count(output, k);
             return;
         }
@@ -24,7 +24,7 @@ class Solution {
             if (!visited[i]) {
                 visited[i] = true;
                 output[depth] = dungeons[i];
-                permutation(dungeons, depth + 1, n, r, k);
+                permutation(dungeons, depth + 1, n, k);
                 visited[i] = false;
             }
         }
@@ -32,11 +32,11 @@ class Solution {
     
     // 순열 메서드 내부에서 수행할 계산 로직
     private void count(int[][] orders, int k) {
-        int fatique = k;
+        int fatigue = k;
         int dungeons = 0;
         for (int[] order : orders) {
-            if (order[0] > fatique) break;
-            fatique -= order[1];
+            if (order[0] > fatigue) break;
+            fatigue -= order[1];
             dungeons++;
         }
         
