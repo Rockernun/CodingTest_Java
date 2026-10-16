@@ -1,24 +1,45 @@
 class Solution {
     
-    int answer = 0;
+    int max = 0;  // 최대 탐험 가능한 던전의 수
+    int[][] output;
     boolean[] visited;
     
     public int solution(int k, int[][] dungeons) {
-        visited = new boolean[dungeons.length];
-        backTrack(dungeons, k, 0);
-        return answer;
+        int n = dungeons.length;
+        output = new int[n][2];
+        visited = new boolean[n];
+        
+        permutation(dungeons, 0, n, n, k);
+        return max;
     }
     
-    private void backTrack(int[][] dungeons, int fatique, int count) {  // 현재 피로도(fatique)와 탐험한 던전의 수를 셀(count)
-        answer = Math.max(answer, count);
+    // 순열 메서드
+    private void permutation(int[][] dungeons, int depth, int n, int r, int k) {
+        if (depth == r) {
+            count(output, k);
+            return;
+        }
         
-        for (int i = 0; i < dungeons.length; i++) {
-            int requiredFatique = dungeons[i][0];
-            if (!visited[i] && (requiredFatique <= fatique)) {
+        for (int i = 0; i < n; i++) {
+            if (!visited[i]) {
                 visited[i] = true;
-                backTrack(dungeons, fatique - dungeons[i][1], count + 1);
+                output[depth] = dungeons[i];
+                permutation(dungeons, depth + 1, n, r, k);
                 visited[i] = false;
             }
         }
+    }
+    
+    // 순열 메서드 내부에서 수행할 계산 로직
+    private void count(int[][] orders, int k) {
+        int fatique = k;
+        int dungeons = 0;
+        for (int[] order : orders) {
+            if (order[0] > fatique) break;
+            fatique -= order[1];
+            dungeons++;
+        }
+        
+        if (dungeons > max) max = dungeons;
     }
 }
