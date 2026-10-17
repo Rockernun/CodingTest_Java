@@ -30,11 +30,6 @@ class Solution {
         for (int[] user : users) {
             int sum = 0;
             for (int e = 0; e < emoticons.length; e++) {
-                if (sum >= user[1]) {
-                    emoticonsPlus++;
-                    break;
-                }
-                
                 if (output[e] >= user[0]) sum += (emoticons[e] / 100 * (100 - output[e]));
                 
                 if (e == emoticons.length - 1 && sum >= user[1]) emoticonsPlus++;
