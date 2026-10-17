@@ -31,10 +31,10 @@ class Solution {
             int sum = 0;
             for (int e = 0; e < emoticons.length; e++) {
                 if (output[e] >= user[0]) sum += (emoticons[e] / 100 * (100 - output[e]));
-                
-                if (e == emoticons.length - 1 && sum >= user[1]) emoticonsPlus++;
-                if (e == emoticons.length - 1 && sum < user[1]) totalPurchasedAmount += sum;
             }
+            
+            if (sum >= user[1]) emoticonsPlus++;
+            if (sum < user[1]) totalPurchasedAmount += sum;
         }
         
         if (plus < emoticonsPlus) {
