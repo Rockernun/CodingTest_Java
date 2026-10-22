@@ -1,47 +1,43 @@
-import java.util.*;
+import java.util.Arrays;
 
 class Solution {
     
-    Map<Integer, List<int[]>> adjList;
-    boolean[] visited;
+    int[] parent;
+    int answer;
+    int bridges;
     
     public int solution(int n, int[][] costs) {
-        int answer = 0;
-        adjList = new HashMap<>();
-        visited = new boolean[n];
+        Arrays.sort(costs, (a, b) -> Integer.compare(a[2], b[2]));
+        parent = new int[n];
+        answer = 0;
+        bridges = 0;
         
         for (int i = 0; i < n; i++) {
-            adjList.put(i, new ArrayList<>());
+            parent[i] = i;
         }
         
-        for (int[] c : costs) {
-            int node1 = c[0];
-            int node2 = c[1];
-            int cost = c[2];
-            
-            adjList.get(node1).add(new int[]{node2, cost});
-            adjList.get(node2).add(new int[]{node1, cost});
-        }
-        
-        PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> Integer.compare(a[1], b[1]));
-        pq.offer(new int[]{0, 0});
-        visited[0] = true;
-        
-        while (!pq.isEmpty()) {
-            int[] current = pq.poll();
-            
-            if (!visited[current[0]]) {
-                answer += current[1];
-                visited[current[0]] = true;   
-            }
-            
-            for (int[] next : adjList.get(current[0])) {
-                if (!visited[next[0]]) {
-                    pq.offer(new int[]{next[0], next[1]});
-                }
+        for (int[] cost : costs) {
+            if (bridges == n - 1) break;
+            if (find(cost[0]) != find(cost[1])) {
+                union(cost[0], cost[1]);
+                answer += cost[2];
+                bridges++;
             }
         }
         
         return answer;
+    }
+    
+    // 루트 노드를 찾는 메서드
+    private int find(int x) {
+        if (parent[x] == x) return x;
+        return parent[x] = find(parent[x]);
+    }
+    
+    // 두 집합을 하나의 집합으로 합치기
+    private void union(int x, int y) {
+        int root1 = find(x);
+        int root2 = find(y);
+        parent[root2] = root1;
     }
 }
