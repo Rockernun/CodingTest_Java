@@ -1,8 +1,7 @@
 import java.util.*;
 
 class Solution {
-    
-    int max = Integer.MIN_VALUE;
+
     int[] oils;
     int[] dr = {-1, 1, 0, 0};
     int[] dc = {0, 0, -1, 1};
