@@ -1,42 +1,36 @@
 import java.util.*;
 
 class Solution {
+    
+    Map<String, Set<String>> reportInfo;
+    
     public int[] solution(String[] id_list, String[] report, int k) {
-        Map<String, Set<String>> map1 = new HashMap<>();
-        Map<String, Integer> map2 = new HashMap<>();
-        int[] answer = new int[id_list.length];
-        
-        for (String id : id_list) {
-            map1.put(id, new HashSet<>());
-            map2.put(id, 0);
-        }
-        
-        for (String s : report) {
-            String[] split = s.split(" ");
-            map1.get(split[0]).add(split[1]);
-        }
-        
-        for (String s1 : map2.keySet()) {
-            for (String s2 : map1.get(s1)) {
-                map2.put(s2, map2.get(s2) + 1);
-            }
-        }
-        
-        List<String> reportedUsers = new ArrayList<>();
-        
-        for (String user : map2.keySet()) {
-            if (map2.get(user) >= k) {
-                reportedUsers.add(user);
-            }
-        }
+        reportInfo = new HashMap<>();
+        int[] count = new int[id_list.length];
+        for (String id : id_list) reportInfo.put(id, new HashSet<>());
+        for (String id : report) reportInfo.get(id.split(" ")[0]).add(id.split(" ")[1]);
         
         for (int i = 0; i < id_list.length; i++) {
-            int count = 0;
-            for (String reportedUser : reportedUsers) {
-                if (map1.get(id_list[i]).contains(reportedUser)) count++;
-            }
+            String current = id_list[i];
             
-            answer[i] = count;
+            for (String s1 : reportInfo.keySet()) {
+                for (String s2 : reportInfo.get(s1)) {
+                    if (s2.equals(current)) count[i]++;
+                }
+            }
+        }
+        
+        List<String> reportedList = new ArrayList<>();
+        for (int i = 0; i < id_list.length; i++) {
+            if (count[i] >= k) reportedList.add(id_list[i]);
+        }
+        
+        int[] answer = new int[id_list.length];
+        for (int i = 0; i < id_list.length; i++) {
+            Set<String> set = reportInfo.get(id_list[i]);
+            for (String s : reportedList) {
+                if (set.contains(s)) answer[i]++;
+            }
         }
         
         return answer;
