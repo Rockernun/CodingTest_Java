@@ -3,11 +3,11 @@ import java.util.PriorityQueue;
 class Solution {
     public int solution(int[] scoville, int K) {
         int mix = 0;
-        PriorityQueue<Integer> pq = new PriorityQueue<>();
-        for (int s : scoville) pq.offer(s);
+        PriorityQueue<Long> pq = new PriorityQueue<>();
+        for (int s : scoville) pq.offer((long) s);
         
         while (!pq.isEmpty()) {
-            int current = pq.poll();
+            long current = pq.poll();
 
             if (current >= K) return mix;
             
