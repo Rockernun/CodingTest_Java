@@ -14,8 +14,6 @@ class Solution {
             if (!pq.isEmpty()) {
                 pq.offer(current + (pq.poll() * 2));
                 mix++;
-            } else {
-                continue;
             }
         }
         
