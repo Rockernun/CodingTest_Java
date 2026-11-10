@@ -2,23 +2,23 @@ import java.util.PriorityQueue;
 
 class Solution {
     public int solution(int[] scoville, int K) {
+        int mix = 0;
         PriorityQueue<Integer> pq = new PriorityQueue<>();
         for (int s : scoville) pq.offer(s);
         
-        int mix = 0;
-        
         while (!pq.isEmpty()) {
-            if (pq.peek() >= K) return mix;
-            if (pq.size() == 1) break;
-            int mostMin = pq.poll();
-            int secondMin = pq.poll();
+            int current = pq.poll();
+
+            if (current >= K) return mix;
             
-            int newScoville = mostMin + secondMin * 2;
-            pq.offer(newScoville);
-            mix++;
+            if (!pq.isEmpty()) {
+                pq.offer(current + (pq.poll() * 2));
+                mix++;
+            } else {
+                continue;
+            }
         }
         
-        if (pq.size() == 1 && pq.peek() < K) return -1;
-        return mix;
+        return -1;
     }
 }
