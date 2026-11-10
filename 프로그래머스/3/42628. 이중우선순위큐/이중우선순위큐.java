@@ -1,28 +1,33 @@
 import java.util.PriorityQueue;
+import java.util.Collections;
 
 class Solution {
     public int[] solution(String[] operations) {
-        PriorityQueue<Integer> minHeap = new PriorityQueue<>();
-        PriorityQueue<Integer> maxHeap = new PriorityQueue<>((a, b) -> Integer.compare(b, a));
+        PriorityQueue<Integer> minPq = new PriorityQueue<>();
+        PriorityQueue<Integer> maxPq = new PriorityQueue<>(Collections.reverseOrder());
+        int insert = 0;
+        int delete = 0;
         
-        for (String operation : operations) {
-            String[] split = operation.split(" ");
+        for (String o : operations) {
+            String[] split = o.split(" ");
             if (split[0].equals("I")) {
-                if (split[1].charAt(0) == '-') {
-                    minHeap.offer(Integer.parseInt(split[1].substring(1)) * -1);
-                    maxHeap.offer(Integer.parseInt(split[1].substring(1)) * -1);
+                minPq.offer(Integer.parseInt(split[1]));
+                maxPq.offer(Integer.parseInt(split[1]));
+                insert++;
+            } else if (split[0].equals("D")) {
+                if (insert == delete) continue;
+                if (split[1].startsWith("-")) {
+                    int min = minPq.poll();
+                    maxPq.remove(min);
                 } else {
-                    minHeap.offer(Integer.parseInt(split[1]));
-                    maxHeap.offer(Integer.parseInt(split[1]));
+                    int max = maxPq.poll();
+                    minPq.remove(max);
                 }
-            } else if (split[0].equals("D") && split[1].equals("1")) { 
-                if (!maxHeap.isEmpty()) minHeap.remove(maxHeap.poll());
-            } else if (split[0].equals("D") && split[1].equals("-1")) {
-                if (!minHeap.isEmpty()) maxHeap.remove(minHeap.poll());
+                delete++;
             }
         }
         
-        if (maxHeap.isEmpty()) return new int[]{0, 0};
-        return new int[]{maxHeap.poll(), minHeap.poll()};
+        if (insert == delete) return new int[]{0, 0};
+        return new int[]{maxPq.poll(), minPq.poll()};
     }
 }
